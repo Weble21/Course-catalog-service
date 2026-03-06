@@ -56,3 +56,11 @@ allOpen {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+kotlin {
+	sourceSets {
+		named("test") {
+			kotlin.srcDirs("src/test/intg", "src/test/unit")
+		}
+	}
+}
