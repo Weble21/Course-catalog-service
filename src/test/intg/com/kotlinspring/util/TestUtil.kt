@@ -15,3 +15,15 @@ fun courseEntityList() = listOf(
         "Wiremock for Java Developers", "Development" ,
     )
 )
+
+fun courseDTO(
+    id: Int? = null,
+    name: String = "Default Kotlin Spring Boot",
+    category: String = "Dilip Sundarraj",
+    //instructorId: Int? = 1
+) = CourseDTO(
+    id,
+    name,
+    category,
+    //instructorId
+)
