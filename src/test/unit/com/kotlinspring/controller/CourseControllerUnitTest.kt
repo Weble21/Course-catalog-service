@@ -98,7 +98,7 @@ class CourseControllerUnitTest {
     fun retrieveAllCourses() {
 
         //list가 반환값이라 returnsMany 써야됨
-        every { courseServiceMockk.retrieveAllCourses() }.returnsMany(
+        every { courseServiceMockk.retrieveAllCourses(any()) }.returnsMany(
             listOf(courseDTO(id = 1), courseDTO(id = 2, name = "Build"))
         )
         val courseDTOs = webTestClient
