@@ -50,6 +50,51 @@ class CourseControllerUnitTest {
     }
 
     @Test
+    fun addCourse_validation() {
+
+        val courseDTO = CourseDTO(
+            null, "", ""
+        )
+
+        every { courseServiceMockk.addCourse(any()) } returns courseDTO(id = 1)
+
+        val response = webTestClient
+            .post()
+            .uri("/v1/courses")
+            .bodyValue(courseDTO)
+            .exchange()
+            .expectStatus().isBadRequest
+            .expectBody(String::class.java)
+            .returnResult()
+            .responseBody
+
+        assertEquals("courseDTO.category must not be blank, courseDTO.name must not be blank", response)
+    }
+
+    @Test
+    fun addCourse_runtimeException() {
+
+        val courseDTO = CourseDTO(
+            null, "Build Restful APIs using SpringBoot and Kotlin", "Dilip Sundarraj"
+        )
+
+        val errorMessage = "Unexpected Error Occurred"
+        every { courseServiceMockk.addCourse(any()) } throws RuntimeException(errorMessage)
+
+        val response = webTestClient
+            .post()
+            .uri("/v1/courses")
+            .bodyValue(courseDTO)
+            .exchange()
+            .expectStatus().is5xxServerError
+            .expectBody(String::class.java)
+            .returnResult()
+            .responseBody
+
+        assertEquals(errorMessage, response)
+    }
+
+    @Test
     fun retrieveAllCourses() {
 
         //list가 반환값이라 returnsMany 써야됨
