@@ -2,6 +2,7 @@ package com.kotlinspring.util
 
 import com.kotlinspring.dto.CourseDTO
 import com.kotlinspring.entity.Course
+import com.kotlinspring.entity.Instructor
 
 
 fun courseEntityList() = listOf(
@@ -14,6 +15,15 @@ fun courseEntityList() = listOf(
     Course(null,
         "Wiremock for Java Developers", "Development" ,
     )
+)
+
+fun instructorEntityList() = listOf(
+    Instructor(null,
+        "Donggeon"),
+    Instructor(null,
+        "Sandra"),
+    Instructor(null,
+        "Dilip")
 )
 
 fun courseDTO(
