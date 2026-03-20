@@ -1,6 +1,5 @@
 package com.kotlinspring.controller
 
-import com.kotlinspring.CourseCatalogServiceApplication
 import com.kotlinspring.dto.CourseDTO
 import com.kotlinspring.service.CourseService
 import jakarta.validation.Valid

@@ -3,7 +3,10 @@ package com.kotlinspring.controller
 import com.kotlinspring.dto.CourseDTO
 import com.kotlinspring.entity.Course
 import com.kotlinspring.repository.CourseRepository
+import com.kotlinspring.repository.InstructorRepository
+import com.kotlinspring.util.PostgreSQLContainerInitializer
 import com.kotlinspring.util.courseEntityList
+import com.kotlinspring.util.instructorEntity
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -12,13 +15,20 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.util.UriComponentsBuilder
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.junit.jupiter.Container
+import org.testcontainers.junit.jupiter.Testcontainers
+import org.testcontainers.utility.DockerImageName
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @AutoConfigureWebTestClient
-class CourseControllerIntgTest {
+@Testcontainers
+class CourseControllerIntgTest : PostgreSQLContainerInitializer() {
 
     @Autowired
     lateinit var webTestClient: WebTestClient
@@ -26,18 +36,46 @@ class CourseControllerIntgTest {
     @Autowired
     lateinit var courseRepository: CourseRepository
 
+    @Autowired
+    lateinit var instructorRepository: InstructorRepository
+
+//    companion object {
+//
+//        @Container
+//        val postgresDB = PostgreSQLContainer<Nothing>(DockerImageName.parse("postgres:13-alpine")).apply {
+//            withDatabaseName("testdb")
+//            withUsername("postgres")
+//            withPassword("secret")
+//        }
+//
+//        @JvmStatic
+//        @DynamicPropertySource
+//        fun properties(registry: DynamicPropertyRegistry) {
+//            registry.add("spring.datasource.url", postgresDB::getJdbcUrl)
+//            registry.add("spring.datasource.username", postgresDB::getUsername)
+//            registry.add("spring.datasource.password", postgresDB::getPassword)
+//        }
+//    }
+
     @BeforeEach
     fun setup() {
         courseRepository.deleteAll()
-        val courses = courseEntityList()
+        instructorRepository.deleteAll()
+
+        val instructor = instructorEntity()
+        instructorRepository.save(instructor)
+
+        val courses = courseEntityList(instructor)
         courseRepository.saveAll(courses)
     }
 
     @Test
     fun addCourse() {
 
+        val instructor = instructorRepository.findAll().first()
+
         val courseDTO = CourseDTO(
-            null, "rBuild Restful APIs using SpringBoot and Kotlin", "Dilip Sundarraj"
+            null, "rBuild Restful APIs using SpringBoot and Kotlin", "Dilip Sundarraj", instructor.id
         )
 
         val savedCourseDTO = webTestClient
@@ -96,8 +134,10 @@ class CourseControllerIntgTest {
     @Test
     fun updateCourse() {
         //existing course
+        val instructor = instructorRepository.findAll().first()
+
         val course = Course(null,
-            "Build RESTful APIs using SpringBoot and Kotlin", "Development")
+            "Build RESTful APIs using SpringBoot and Kotlin", "Development", instructor)
         courseRepository.save(course)
         //courseId
         //Updated CourseDTO
@@ -120,8 +160,10 @@ class CourseControllerIntgTest {
     @Test
     fun deleteCourse() {
 
+        val instructor = instructorRepository.findAll().first()
+
         val course = Course(null,
-            "Build RESTful APIs using SpringBoot and Kotlin", "Development")
+            "Build RESTful APIs using SpringBoot and Kotlin", "Development", instructor)
         courseRepository.save(course)
 
         val deleteCourse = webTestClient

@@ -24,4 +24,8 @@ data class Instructor(
     )
     var courses : MutableList<Course> = mutableListOf()
 
-)
+) {
+    override fun toString(): String {
+        return "Instructor(id=$id, name='$name')"
+    }
+}
